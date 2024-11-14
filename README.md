@@ -1,6 +1,7 @@
 # apple_shop_flutter
 
-A new Flutter project.
+this is ecommers prject.
+it uses bloc state management.
 
 ## Getting Started
 
