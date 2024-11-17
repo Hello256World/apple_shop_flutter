@@ -30,5 +30,11 @@ class ProductBloc extends Bloc<ProductEvent, ProductState> {
         ));
       },
     );
+
+    on<ProductToShopEvent>(
+      (event, emit) async {
+        await _productRepository.addProductToShop(event.product);
+      },
+    );
   }
 }

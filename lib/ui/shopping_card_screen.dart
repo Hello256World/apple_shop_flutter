@@ -1,16 +1,41 @@
+import 'package:apple_shop_flutter/bloc/shopping_card/shopping_card_bloc.dart';
+import 'package:apple_shop_flutter/bloc/shopping_card/shopping_card_state.dart';
 import 'package:apple_shop_flutter/data/constants.dart';
+import 'package:apple_shop_flutter/data/models/shopping_card.dart';
+import 'package:apple_shop_flutter/data/widgets/cached_image.dart';
 import 'package:dotted_line/dotted_line.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
 
-class ShoppingCardScreen extends StatelessWidget {
+class ShoppingCardScreen extends StatefulWidget {
   const ShoppingCardScreen({super.key});
+
+  @override
+  State<ShoppingCardScreen> createState() => _ShoppingCardScreenState();
+}
+
+class _ShoppingCardScreenState extends State<ShoppingCardScreen> {
+  // final Isar _dbInstance = locator.get();
+  // final ValueNotifier<List<ShoppingCard>> _valueNotifier = ValueNotifier([]);
+  // late Stream<void> _dbWathcer;
+
+  // @override
+  // void initState() {
+  //   super.initState();
+  //   _valueNotifier.value = _dbInstance.shoppingCards.where().findAllSync();
+  //   _dbWathcer = _dbInstance.shoppingCards.watchLazy();
+  //   _dbWathcer.listen((_) {
+  //     _valueNotifier.value = _dbInstance.shoppingCards.where().findAllSync();
+  //   });
+  // }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       backgroundColor: CustomColor.whiteColor,
       body: SafeArea(
-        child: Stack(
+        child: BlocBuilder<ShoppingCardBloc,ShoppingCardState>(builder: (context, state) {
+          return Stack(
           alignment: AlignmentDirectional.bottomCenter,
           children: [
             CustomScrollView(
@@ -50,17 +75,23 @@ class ShoppingCardScreen extends StatelessWidget {
                     ],
                   ),
                 ),
-                SliverPadding(
+                if(state is ShoppingCardDataState)...{
+                  state.cards.fold((l) {
+                    return const SliverToBoxAdapter();
+                  }, (r) {
+                    return SliverPadding(
                   padding: const EdgeInsets.only(bottom: 78),
                   sliver: SliverList(
                     delegate: SliverChildBuilderDelegate(
                       (context, index) {
-                        return const ShoppingCardItem();
+                        return ShoppingCardItem(r[index]);
                       },
-                      childCount: 10,
+                      childCount: r.length,
                     ),
                   ),
-                ),
+                );
+                  },)
+                }
               ],
             ),
             Positioned(
@@ -87,16 +118,20 @@ class ShoppingCardScreen extends StatelessWidget {
               ),
             ),
           ],
-        ),
+        );
+        },)
       ),
     );
   }
 }
 
 class ShoppingCardItem extends StatelessWidget {
-  const ShoppingCardItem({
+  const ShoppingCardItem(
+    this.card, {
     super.key,
   });
+
+  final ShoppingCard card;
 
   @override
   Widget build(BuildContext context) {
@@ -117,114 +152,120 @@ class ShoppingCardItem extends StatelessWidget {
       child: Column(
         children: [
           Expanded(
-              child: Row(
-            children: [
-              Expanded(
-                child: Padding(
-                  padding: const EdgeInsets.only(top: 17.0),
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.end,
-                    children: [
-                      const Text(
-                        'آیفون 13 پرومکس',
-                        style: TextStyle(fontFamily: 'SB', fontSize: 16),
-                      ),
-                      const Text(
-                        'گارانتی 18 ماهه مدیاتک',
-                        style: TextStyle(fontFamily: 'SM', fontSize: 10),
-                      ),
-                      Row(
-                        mainAxisAlignment: MainAxisAlignment.end,
-                        children: [
-                          Container(
-                            width: 25,
-                            height: 15,
-                            decoration: BoxDecoration(
-                              color: CustomColor.redColor,
-                              borderRadius: BorderRadius.circular(7.5),
-                            ),
-                            alignment: Alignment.center,
-                            child: const Text(
-                              '%3',
-                              style: TextStyle(
-                                fontFamily: 'SB',
-                                fontSize: 10,
-                                color: Colors.white,
+            child: Row(
+              children: [
+                Expanded(
+                  child: Padding(
+                    padding: const EdgeInsets.only(top: 17.0),
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.end,
+                      children: [
+                        Text(
+                          card.name,
+                          style:
+                              const TextStyle(fontFamily: 'SB', fontSize: 16),
+                        ),
+                        const Text(
+                          'گارانتی 18 ماهه مدیاتک',
+                          style: TextStyle(fontFamily: 'SM', fontSize: 10),
+                        ),
+                        Row(
+                          mainAxisAlignment: MainAxisAlignment.end,
+                          children: [
+                            Container(
+                              width: 25,
+                              height: 15,
+                              decoration: BoxDecoration(
+                                color: CustomColor.redColor,
+                                borderRadius: BorderRadius.circular(7.5),
+                              ),
+                              alignment: Alignment.center,
+                              child: Text(
+                                '%${((card.discountPrice / card.price) * 100).round()}',
+                                style: const TextStyle(
+                                  fontFamily: 'SB',
+                                  fontSize: 10,
+                                  color: Colors.white,
+                                ),
                               ),
                             ),
-                          ),
-                          const Padding(
-                            padding: EdgeInsets.symmetric(horizontal: 5.0),
-                            child: Text(
-                              'تومان',
-                              style: TextStyle(
+                            const Padding(
+                              padding: EdgeInsets.symmetric(horizontal: 5.0),
+                              child: Text(
+                                'تومان',
+                                style: TextStyle(
+                                  fontFamily: 'SM',
+                                  fontSize: 10,
+                                  color: CustomColor.greyColor,
+                                ),
+                              ),
+                            ),
+                            Text(
+                              card.discountPrice.toString(),
+                              style: const TextStyle(
                                 fontFamily: 'SM',
-                                fontSize: 10,
+                                fontSize: 12,
                                 color: CustomColor.greyColor,
                               ),
                             ),
-                          ),
-                          const Text(
-                            '46,000,000',
-                            style: TextStyle(
-                              fontFamily: 'SM',
-                              fontSize: 12,
-                              color: CustomColor.greyColor,
+                          ],
+                        ),
+                        Wrap(
+                          spacing: 5,
+                          runSpacing: 5,
+                          alignment: WrapAlignment.end,
+                          children: [
+                            const CardOption(
+                              title: '256 گیگابایت',
                             ),
-                          ),
-                        ],
-                      ),
-                      Wrap(
-                        spacing: 5,
-                        runSpacing: 5,
-                        alignment: WrapAlignment.end,
-                        children: [
-                          const CardOption(
-                            title: '256 گیگابایت',
-                          ),
-                          const CardOption(
-                            title: 'آبی',
-                            color: '0330fc',
-                          ),
-                          Container(
-                            padding: const EdgeInsets.symmetric(
-                                horizontal: 10, vertical: 5),
-                            decoration: BoxDecoration(
-                              borderRadius: BorderRadius.circular(10),
-                              border: Border.all(
-                                color: const Color(0xffE5E5E5),
-                                width: 1,
+                            const CardOption(
+                              title: 'آبی',
+                              color: '0330fc',
+                            ),
+                            Container(
+                              padding: const EdgeInsets.symmetric(
+                                  horizontal: 10, vertical: 5),
+                              decoration: BoxDecoration(
+                                borderRadius: BorderRadius.circular(10),
+                                border: Border.all(
+                                  color: const Color(0xffE5E5E5),
+                                  width: 1,
+                                ),
+                              ),
+                              child: Row(
+                                mainAxisSize: MainAxisSize.min,
+                                children: [
+                                  const Text(
+                                    'حذف',
+                                    textDirection: TextDirection.rtl,
+                                    style: TextStyle(
+                                      fontSize: 10,
+                                      fontFamily: 'SM',
+                                      fontWeight: FontWeight.w500,
+                                    ),
+                                  ),
+                                  const SizedBox(width: 5),
+                                  Image.asset('assets/images/trash_icon.png'),
+                                ],
                               ),
                             ),
-                            child: Row(
-                              mainAxisSize: MainAxisSize.min,
-                              children: [
-                                const Text(
-                                  'حذف',
-                                  textDirection: TextDirection.rtl,
-                                  style: TextStyle(
-                                    fontSize: 10,
-                                    fontFamily: 'SM',
-                                    fontWeight: FontWeight.w500,
-                                  ),
-                                ),
-                                const SizedBox(width: 5),
-                                Image.asset('assets/images/trash_icon.png'),
-                              ],
-                            ),
-                          ),
-                        ],
-                      ),
-                    ],
+                          ],
+                        ),
+                      ],
+                    ),
                   ),
                 ),
-              ),
-              const Padding(
-                padding: EdgeInsets.only(right: 10.0, left: 18),
-                child: Image(image: AssetImage('assets/images/iphone_13.png')),
-              ),
-            ],
-          ),),
+                Padding(
+                  padding: const EdgeInsets.only(right: 10.0, left: 18),
+                  child: CachedImage(
+                    imageUrl: card.thumbnail,
+                    width: 80,
+                    height: 104,
+                  ),
+                ),
+              ],
+            ),
+          ),
           const Padding(
             padding: EdgeInsets.symmetric(horizontal: 10.0),
             child: DottedLine(
@@ -235,12 +276,12 @@ class ShoppingCardItem extends StatelessWidget {
               dashGapLength: 5,
             ),
           ),
-          const Padding(
-            padding: EdgeInsets.symmetric(vertical: 20.0),
+          Padding(
+            padding: const EdgeInsets.symmetric(vertical: 20.0),
             child: Row(
               mainAxisAlignment: MainAxisAlignment.center,
               children: [
-                Text(
+                const Text(
                   'تومان',
                   style: TextStyle(
                     fontFamily: 'SM',
@@ -248,10 +289,10 @@ class ShoppingCardItem extends StatelessWidget {
                     color: Colors.black,
                   ),
                 ),
-                SizedBox(width: 5),
+                const SizedBox(width: 5),
                 Text(
-                  '45,350,000',
-                  style: TextStyle(
+                  (card.price - card.discountPrice).toString(),
+                  style: const TextStyle(
                     fontFamily: 'SM',
                     fontSize: 16,
                     color: Colors.black,

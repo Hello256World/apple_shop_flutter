@@ -1,4 +1,5 @@
 import 'package:apple_shop_flutter/data/api/product_api.dart';
+import 'package:apple_shop_flutter/data/models/shopping_card.dart';
 import 'package:apple_shop_flutter/data/models/category.dart';
 import 'package:apple_shop_flutter/data/models/product.dart';
 import 'package:apple_shop_flutter/data/models/product_image.dart';
@@ -7,6 +8,7 @@ import 'package:apple_shop_flutter/data/models/product_variant.dart';
 import 'package:apple_shop_flutter/data/utils/api_exception.dart';
 import 'package:apple_shop_flutter/di/di.dart';
 import 'package:dartz/dartz.dart';
+import 'package:isar/isar.dart';
 
 abstract class IProductRepository {
   Future<Either<String, List<Product>>> getProducts();
@@ -20,10 +22,13 @@ abstract class IProductRepository {
       String productId);
   Future<Either<String, List<Product>>> getProductsByCategory(
       String categoryId);
+  Future<Either<String, String>> addProductToShop(Product product);
+  Future<Either<String, List<ShoppingCard>>> getShoppingCardItems();
 }
 
 class ProductRepository extends IProductRepository {
   final IProductApi _productApi = locator.get();
+  final Isar _dbInstance = locator.get();
 
   @override
   Future<Either<String, List<Product>>> getProducts() async {
@@ -107,6 +112,40 @@ class ProductRepository extends IProductRepository {
       var products = await _productApi.fetchProductByCategory(categoryId);
       return right(products);
     } on ApiException catch (ex) {
+      return left(ex.toString());
+    }
+  }
+
+  @override
+  Future<Either<String, String>> addProductToShop(Product product) async {
+    try {
+      var card = ShoppingCard()
+        ..name = product.name
+        ..categoryId = product.categoryId
+        ..collectionId = product.collectionId
+        ..discountPrice = product.discountPrice
+        ..price = product.price
+        ..productId = product.id
+        ..thumbnail = product.thumbnail;
+
+      await _dbInstance.writeTxn(() async {
+        await _dbInstance.shoppingCards.put(card);
+      });
+
+      return right('product added to shopping card');
+    } catch (ex) {
+      return left(ex.toString());
+    }
+  }
+
+  @override
+  Future<Either<String, List<ShoppingCard>>> getShoppingCardItems() async {
+    try {
+      await Future.delayed(const Duration(seconds: 10), () {});
+      var cards = await _dbInstance.shoppingCards.where().findAll();
+
+      return right(cards);
+    } catch (ex) {
       return left(ex.toString());
     }
   }

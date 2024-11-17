@@ -1,7 +1,8 @@
-import 'package:apple_shop_flutter/bloc/product/product_bloc.dart';
+import 'package:apple_shop_flutter/bloc/shopping_card/shopping_card_bloc.dart';
 import 'package:apple_shop_flutter/data/constants.dart';
 import 'package:apple_shop_flutter/data/models/product.dart';
 import 'package:apple_shop_flutter/data/widgets/cached_image.dart';
+import 'package:apple_shop_flutter/di/di.dart';
 import 'package:apple_shop_flutter/ui/product_screen.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
@@ -21,11 +22,9 @@ class ProductItem extends StatelessWidget {
         Navigator.push(
           context,
           MaterialPageRoute(
-            builder: (context) => BlocProvider(
-              create: (context) => ProductBloc(),
-              child: ProductScreen(
-                product: _product,
-              ),
+            builder: (context) => BlocProvider<ShoppingCardBloc>.value(
+              value: locator.get<ShoppingCardBloc>(),
+              child: ProductScreen(product: _product),
             ),
           ),
         );

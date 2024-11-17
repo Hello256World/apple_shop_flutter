@@ -23,3 +23,7 @@ class ProductResponseState extends ProductState {
     this.productProperties,
   );
 }
+
+class ProducAddedState extends ProductState{
+  
+}

@@ -1,7 +1,10 @@
 import 'dart:ui';
 import 'package:apple_shop_flutter/bloc/category/category_bloc.dart';
 import 'package:apple_shop_flutter/bloc/home/home_bloc.dart';
+import 'package:apple_shop_flutter/bloc/shopping_card/shopping_card_bloc.dart';
+import 'package:apple_shop_flutter/bloc/shopping_card/shopping_card_event.dart';
 import 'package:apple_shop_flutter/data/constants.dart';
+import 'package:apple_shop_flutter/di/di.dart';
 import 'package:apple_shop_flutter/ui/category_screen.dart';
 import 'package:apple_shop_flutter/ui/home_screen.dart';
 import 'package:apple_shop_flutter/ui/profile_screen.dart';
@@ -124,7 +127,14 @@ class _MainScreenState extends State<MainScreen> {
   List<Widget> pageList() {
     return [
       const ProfileScreen(),
-      const ShoppingCardScreen(),
+      BlocProvider(
+        create: (context) {
+          var bloc = locator.get<ShoppingCardBloc>();
+          bloc.add(ShoppingCardDataEvent());
+          return bloc;
+        },
+        child: const ShoppingCardScreen(),
+      ),
       BlocProvider(
         create: (context) => CategoryBloc(),
         child: const CategoryScreen(),
