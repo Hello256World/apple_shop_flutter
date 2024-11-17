@@ -1,6 +1,8 @@
 # apple_shop_flutter
 
-A new Flutter project.
+this is onlion E-commerce project.
+
+this project uses bloc state management.
 
 ## Getting Started
 
