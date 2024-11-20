@@ -1,5 +1,4 @@
 import 'package:apple_shop_flutter/data/utils/api_exception.dart';
-import 'package:apple_shop_flutter/di/di.dart';
 import 'package:dio/dio.dart';
 
 abstract class IAuthentication {
@@ -16,7 +15,9 @@ abstract class IAuthentication {
 }
 
 class Authentication extends IAuthentication {
-  final _dio = locator.get<Dio>();
+  final Dio _dio;
+
+  Authentication(this._dio);
 
   @override
   Future<Response> register(

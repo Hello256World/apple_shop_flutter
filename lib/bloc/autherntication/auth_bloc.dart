@@ -1,12 +1,11 @@
 import 'package:apple_shop_flutter/bloc/autherntication/auth_event.dart';
 import 'package:apple_shop_flutter/bloc/autherntication/auth_state.dart';
 import 'package:apple_shop_flutter/data/repository/authentication_repository.dart';
-import 'package:apple_shop_flutter/di/di.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 
 class AuthBloc extends Bloc<AuthEvent, AuthState> {
-  final IAuthenticationRepository _repository = locator.get();
-  AuthBloc() : super(AuthInitState()) {
+  final IAuthenticationRepository _repository;
+  AuthBloc(this._repository) : super(AuthInitState()) {
     on<LoginRequestEvent>(
       (event, emit) async {
         emit(AuthLoadingState());

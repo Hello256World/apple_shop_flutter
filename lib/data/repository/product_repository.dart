@@ -1,3 +1,4 @@
+import 'dart:async';
 import 'package:apple_shop_flutter/data/api/product_api.dart';
 import 'package:apple_shop_flutter/data/models/shopping_card.dart';
 import 'package:apple_shop_flutter/data/models/category.dart';
@@ -27,8 +28,10 @@ abstract class IProductRepository {
 }
 
 class ProductRepository extends IProductRepository {
-  final IProductApi _productApi = locator.get();
-  final Isar _dbInstance = locator.get();
+  final IProductApi _productApi;
+  final Isar _dbInstance;
+
+  ProductRepository(this._productApi, this._dbInstance);
 
   @override
   Future<Either<String, List<Product>>> getProducts() async {
@@ -141,7 +144,7 @@ class ProductRepository extends IProductRepository {
   @override
   Future<Either<String, List<ShoppingCard>>> getShoppingCardItems() async {
     try {
-      await Future.delayed(const Duration(seconds: 10), () {});
+      await Future.delayed(const Duration(seconds: 1));
       var cards = await _dbInstance.shoppingCards.where().findAll();
 
       return right(cards);

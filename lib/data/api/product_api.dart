@@ -6,7 +6,6 @@ import 'package:apple_shop_flutter/data/models/product_variant.dart';
 import 'package:apple_shop_flutter/data/models/variant.dart';
 import 'package:apple_shop_flutter/data/models/variant_type.dart';
 import 'package:apple_shop_flutter/data/utils/api_exception.dart';
-import 'package:apple_shop_flutter/di/di.dart';
 import 'package:dio/dio.dart';
 
 abstract class IProductApi {
@@ -23,7 +22,9 @@ abstract class IProductApi {
 }
 
 class ProductApi extends IProductApi {
-  final Dio _dio = locator.get();
+  final Dio _dio;
+
+  ProductApi(this._dio);
 
   @override
   Future<List<Product>> fetchProducts() async {

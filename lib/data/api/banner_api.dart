@@ -1,6 +1,5 @@
 import 'package:apple_shop_flutter/data/models/product_banner.dart';
 import 'package:apple_shop_flutter/data/utils/api_exception.dart';
-import 'package:apple_shop_flutter/di/di.dart';
 import 'package:dio/dio.dart';
 
 abstract class IBannerApi {
@@ -8,7 +7,10 @@ abstract class IBannerApi {
 }
 
 class BannerApi extends IBannerApi {
-  final Dio _dio = locator.get();
+  final Dio _dio;
+
+  BannerApi(this._dio);
+
   @override
   Future<List<ProductBanner>> fetchProductBanners() async {
     try {

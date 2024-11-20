@@ -2,6 +2,7 @@ import 'package:apple_shop_flutter/bloc/demo/demo_bloc.dart';
 import 'package:apple_shop_flutter/data/constants.dart';
 import 'package:apple_shop_flutter/data/models/category.dart';
 import 'package:apple_shop_flutter/data/widgets/cached_image.dart';
+import 'package:apple_shop_flutter/di/di.dart';
 import 'package:apple_shop_flutter/ui/demo_screen.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
@@ -21,7 +22,7 @@ class CategoryItem extends StatelessWidget {
           context,
           MaterialPageRoute(
             builder: (context) => BlocProvider(
-              create: (context) => DemoBloc(),
+              create: (context) => DemoBloc(locator.get()),
               child: DemoScreen(
                 _category,
               ),

@@ -136,11 +136,15 @@ class _MainScreenState extends State<MainScreen> {
         child: const ShoppingCardScreen(),
       ),
       BlocProvider(
-        create: (context) => CategoryBloc(),
+        create: (context) => CategoryBloc(locator.get()),
         child: const CategoryScreen(),
       ),
       BlocProvider(
-        create: (context) => HomeBloc(),
+        create: (context) => HomeBloc(
+          locator.get(),
+          locator.get(),
+          locator.get(),
+        ),
         child: const HomeScreen(),
       )
     ];

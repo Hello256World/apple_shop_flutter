@@ -22,10 +22,12 @@ class ProductItem extends StatelessWidget {
         Navigator.push(
           context,
           MaterialPageRoute(
-            builder: (context) => BlocProvider<ShoppingCardBloc>.value(
-              value: locator.get<ShoppingCardBloc>(),
-              child: ProductScreen(product: _product),
-            ),
+            builder: (context) {
+              return BlocProvider<ShoppingCardBloc>.value(
+                value: locator.get<ShoppingCardBloc>(),
+                child: ProductScreen(product: _product),
+              );
+            },
           ),
         );
       },

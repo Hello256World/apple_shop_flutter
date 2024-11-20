@@ -1,7 +1,6 @@
 import 'package:apple_shop_flutter/data/api/category_api.dart';
 import 'package:apple_shop_flutter/data/models/category.dart';
 import 'package:apple_shop_flutter/data/utils/api_exception.dart';
-import 'package:apple_shop_flutter/di/di.dart';
 import 'package:dartz/dartz.dart';
 
 abstract class ICategoryRepository {
@@ -9,7 +8,9 @@ abstract class ICategoryRepository {
 }
 
 class CategoryRepository extends ICategoryRepository {
-  final ICategoryApi _categoryApi = locator.get();
+  final ICategoryApi _categoryApi;
+
+  CategoryRepository(this._categoryApi);
 
   @override
   Future<Either<String, List<Category>>> fetchCategoryRepository() async {

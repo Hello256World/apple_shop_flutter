@@ -36,32 +36,32 @@ Future<void> diSetup() async {
 
   // apis
   locator.registerFactory<IAuthentication>(
-    () => Authentication(),
+    () => Authentication(locator.get()),
   );
   locator.registerFactory<ICategoryApi>(
-    () => CategoryApi(),
+    () => CategoryApi(locator.get()),
   );
   locator.registerFactory<IBannerApi>(
-    () => BannerApi(),
+    () => BannerApi(locator.get()),
   );
   locator.registerFactory<IProductApi>(
-    () => ProductApi(),
+    () => ProductApi(locator.get()),
   );
 
   // repositories
   locator.registerFactory<IAuthenticationRepository>(
-    () => AuthenticationRepository(),
+    () => AuthenticationRepository(locator.get()),
   );
   locator.registerFactory<ICategoryRepository>(
-    () => CategoryRepository(),
+    () => CategoryRepository(locator.get()),
   );
   locator.registerFactory<IBannerRepository>(
-    () => BannerRepository(),
+    () => BannerRepository(locator.get()),
   );
   locator.registerFactory<IProductRepository>(
-    () => ProductRepository(),
+    () => ProductRepository(locator.get(),locator.get()),
   );
 
   //blocs
-  locator.registerSingleton<ShoppingCardBloc>(ShoppingCardBloc());
+  locator.registerSingleton<ShoppingCardBloc>(ShoppingCardBloc(locator.get()));
 }

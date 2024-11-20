@@ -1,8 +1,6 @@
 import 'package:apple_shop_flutter/data/api/authentication_api.dart';
-// import 'package:apple_shop_flutter/data/utils/auth_manager.dart';
-import 'package:apple_shop_flutter/data/utils/api_exception.dart';
 import 'package:apple_shop_flutter/data/utils/auth_manager.dart';
-import 'package:apple_shop_flutter/di/di.dart';
+import 'package:apple_shop_flutter/data/utils/api_exception.dart';
 import 'package:dartz/dartz.dart';
 
 abstract class IAuthenticationRepository {
@@ -19,7 +17,9 @@ abstract class IAuthenticationRepository {
 }
 
 class AuthenticationRepository extends IAuthenticationRepository {
-  final _authenticatoin = locator.get<IAuthentication>();
+  final IAuthentication _authenticatoin;
+
+  AuthenticationRepository(this._authenticatoin);
 
   @override
   Future<Either<String, String>> registerRepository(

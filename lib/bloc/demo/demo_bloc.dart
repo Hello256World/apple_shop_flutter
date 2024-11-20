@@ -5,8 +5,8 @@ import 'package:apple_shop_flutter/di/di.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 
 class DemoBloc extends Bloc<DemoEvent, DemoState> {
-  final IProductRepository _productRepository = locator.get();
-  DemoBloc() : super(InitProductState()) {
+  final IProductRepository _productRepository;
+  DemoBloc(this._productRepository) : super(InitProductState()) {
     on<ProductResponseEvent>(
       (event, emit) async {
         emit(LoadingProductState());

@@ -6,6 +6,7 @@ import 'package:apple_shop_flutter/data/widgets/cached_image.dart';
 import 'package:dotted_line/dotted_line.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:url_launcher/url_launcher.dart';
 
 class ShoppingCardScreen extends StatefulWidget {
   const ShoppingCardScreen({super.key});
@@ -15,112 +16,150 @@ class ShoppingCardScreen extends StatefulWidget {
 }
 
 class _ShoppingCardScreenState extends State<ShoppingCardScreen> {
-  // final Isar _dbInstance = locator.get();
-  // final ValueNotifier<List<ShoppingCard>> _valueNotifier = ValueNotifier([]);
-  // late Stream<void> _dbWathcer;
-
-  // @override
-  // void initState() {
-  //   super.initState();
-  //   _valueNotifier.value = _dbInstance.shoppingCards.where().findAllSync();
-  //   _dbWathcer = _dbInstance.shoppingCards.watchLazy();
-  //   _dbWathcer.listen((_) {
-  //     _valueNotifier.value = _dbInstance.shoppingCards.where().findAllSync();
-  //   });
-  // }
+  @override
+  void initState() {
+    super.initState();
+  }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       backgroundColor: CustomColor.whiteColor,
-      body: SafeArea(
-        child: BlocBuilder<ShoppingCardBloc,ShoppingCardState>(builder: (context, state) {
+      body: SafeArea(child: BlocBuilder<ShoppingCardBloc, ShoppingCardState>(
+        builder: (context, state) {
           return Stack(
-          alignment: AlignmentDirectional.bottomCenter,
-          children: [
-            CustomScrollView(
-              slivers: [
-                SliverToBoxAdapter(
-                  child: Stack(
-                    alignment: AlignmentDirectional.center,
-                    children: [
-                      Container(
-                        height: 46,
-                        margin: const EdgeInsets.fromLTRB(44, 20, 44, 32),
-                        padding: const EdgeInsets.only(left: 15),
-                        decoration: BoxDecoration(
-                          color: Colors.white,
-                          borderRadius: BorderRadius.circular(15),
+            alignment: AlignmentDirectional.bottomCenter,
+            children: [
+              CustomScrollView(
+                slivers: [
+                  SliverToBoxAdapter(
+                    child: Stack(
+                      alignment: AlignmentDirectional.center,
+                      children: [
+                        Container(
+                          height: 46,
+                          margin: const EdgeInsets.fromLTRB(44, 20, 44, 32),
+                          padding: const EdgeInsets.only(left: 15),
+                          decoration: BoxDecoration(
+                            color: Colors.white,
+                            borderRadius: BorderRadius.circular(15),
+                          ),
                         ),
-                      ),
-                      const Positioned(
-                        top: 30,
-                        left: 59,
-                        child: Image(
-                          image: AssetImage('assets/images/blue_apple.png'),
+                        const Positioned(
+                          top: 30,
+                          left: 59,
+                          child: Image(
+                            image: AssetImage('assets/images/blue_apple.png'),
+                          ),
                         ),
-                      ),
-                      const Positioned(
-                        top: 31,
-                        child: Text(
-                          'سبد خرید',
-                          textAlign: TextAlign.center,
+                        const Positioned(
+                          top: 31,
+                          child: Text(
+                            'سبد خرید',
+                            textAlign: TextAlign.center,
+                            style: TextStyle(
+                              color: CustomColor.blueColor,
+                              fontFamily: 'SB',
+                              fontSize: 16,
+                            ),
+                          ),
+                        ),
+                      ],
+                    ),
+                  ),
+                  if (state is ShoppingCardDataState) ...{
+                    state.cards.fold(
+                      (l) {
+                        return const SliverToBoxAdapter();
+                      },
+                      (r) {
+                        return SliverPadding(
+                          padding: const EdgeInsets.only(bottom: 78),
+                          sliver: SliverList(
+                            delegate: SliverChildBuilderDelegate(
+                              (context, index) {
+                                return ShoppingCardItem(r[index]);
+                              },
+                              childCount: r.length,
+                            ),
+                          ),
+                        );
+                      },
+                    )
+                  }
+                ],
+              ),
+              if (state is ShoppingCardDataState) ...{
+                state.cards.fold(
+                  (l) {
+                    return Positioned(
+                      left: 44,
+                      right: 44,
+                      bottom: 20,
+                      child: ElevatedButton(
+                        onPressed: () {},
+                        style: ElevatedButton.styleFrom(
+                          backgroundColor: CustomColor.greenColor,
+                          shape: RoundedRectangleBorder(
+                            borderRadius: BorderRadius.circular(15),
+                          ),
+                          fixedSize: const Size.fromHeight(53),
+                        ),
+                        child: const Text(
+                          'ادامه فرآیند خرید',
                           style: TextStyle(
-                            color: CustomColor.blueColor,
                             fontFamily: 'SB',
                             fontSize: 16,
+                            color: Colors.white,
                           ),
                         ),
                       ),
-                    ],
-                  ),
-                ),
-                if(state is ShoppingCardDataState)...{
-                  state.cards.fold((l) {
-                    return const SliverToBoxAdapter();
-                  }, (r) {
-                    return SliverPadding(
-                  padding: const EdgeInsets.only(bottom: 78),
-                  sliver: SliverList(
-                    delegate: SliverChildBuilderDelegate(
-                      (context, index) {
-                        return ShoppingCardItem(r[index]);
-                      },
-                      childCount: r.length,
-                    ),
-                  ),
-                );
-                  },)
-                }
-              ],
-            ),
-            Positioned(
-              left: 44,
-              right: 44,
-              bottom: 20,
-              child: ElevatedButton(
-                onPressed: () {},
-                style: ElevatedButton.styleFrom(
-                  backgroundColor: CustomColor.greenColor,
-                  shape: RoundedRectangleBorder(
-                    borderRadius: BorderRadius.circular(15),
-                  ),
-                  fixedSize: const Size.fromHeight(53),
-                ),
-                child: const Text(
-                  'ادامه فرآیند خرید',
-                  style: TextStyle(
-                    fontFamily: 'SB',
-                    fontSize: 16,
-                    color: Colors.white,
-                  ),
-                ),
-              ),
-            ),
-          ],
-        );
-        },)
-      ),
+                    );
+                  },
+                  (r) {
+                    var totalPrice = r.fold(
+                      0,
+                      (initPrice, shoppingCard) =>
+                          initPrice +
+                          (shoppingCard.price - shoppingCard.discountPrice),
+                    );
+                    return Positioned(
+                      left: 44,
+                      right: 44,
+                      bottom: 20,
+                      child: ElevatedButton(
+                        onPressed: () {
+                          launchUrl(
+                            Uri.parse('https://okala.com'),
+                            mode: LaunchMode.externalApplication,
+                          );
+                        },
+                        style: ElevatedButton.styleFrom(
+                          backgroundColor: CustomColor.greenColor,
+                          shape: RoundedRectangleBorder(
+                            borderRadius: BorderRadius.circular(15),
+                          ),
+                          fixedSize: const Size.fromHeight(53),
+                        ),
+                        child: Text(
+                          totalPrice == 0
+                              ? 'سبد خرید شما خالی است'
+                              : totalPrice.toString(),
+                          style: const TextStyle(
+                            fontFamily: 'SB',
+                            fontSize: 16,
+                            color: Colors.white,
+                          ),
+                        ),
+                      ),
+                    );
+                  },
+                )
+              }
+            ],
+          );
+        },
+      )),
     );
   }
 }

@@ -1,6 +1,5 @@
 import 'package:apple_shop_flutter/data/models/category.dart';
 import 'package:apple_shop_flutter/data/utils/api_exception.dart';
-import 'package:apple_shop_flutter/di/di.dart';
 import 'package:dio/dio.dart';
 
 abstract class ICategoryApi {
@@ -8,7 +7,9 @@ abstract class ICategoryApi {
 }
 
 class CategoryApi extends ICategoryApi {
-  final Dio _dio = locator.get();
+  final Dio _dio ;
+
+  CategoryApi(this._dio);
 
   @override
   Future<List<Category>> fetchCategories() async {

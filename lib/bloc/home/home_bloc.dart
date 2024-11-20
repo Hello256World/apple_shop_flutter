@@ -3,15 +3,18 @@ import 'package:apple_shop_flutter/bloc/home/home_state.dart';
 import 'package:apple_shop_flutter/data/repository/banner_repository.dart';
 import 'package:apple_shop_flutter/data/repository/category_repository.dart';
 import 'package:apple_shop_flutter/data/repository/product_repository.dart';
-import 'package:apple_shop_flutter/di/di.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 
 class HomeBloc extends Bloc<HomeEvent, HomeState> {
-  final IBannerRepository _bannerRepository = locator.get();
-  final ICategoryRepository _categoryRepository = locator.get();
-  final IProductRepository _productRepository = locator.get();
+  final IBannerRepository _bannerRepository;
+  final ICategoryRepository _categoryRepository;
+  final IProductRepository _productRepository;
 
-  HomeBloc() : super(HomeInitState()) {
+  HomeBloc(
+    this._bannerRepository,
+    this._categoryRepository,
+    this._productRepository,
+  ) : super(HomeInitState()) {
     on<HomeResponseEvent>(
       (event, emit) async {
         emit(HomeLoadingState());

@@ -9,6 +9,7 @@ import 'package:apple_shop_flutter/data/models/product.dart';
 import 'package:apple_shop_flutter/data/models/product_variant.dart';
 import 'package:apple_shop_flutter/data/models/variant_type.dart';
 import 'package:apple_shop_flutter/data/widgets/cached_image.dart';
+import 'package:apple_shop_flutter/di/di.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 
@@ -29,7 +30,7 @@ class _ProductScreenState extends State<ProductScreen> {
   Widget build(BuildContext context) {
     return BlocProvider(
       create: (context) {
-        var bloc = ProductBloc();
+        var bloc = ProductBloc(locator.get());
         bloc.add(ProductInitializeEvent(
             widget.product.id, widget.product.categoryId));
         return bloc;
@@ -355,14 +356,10 @@ class _ProductScreenState extends State<ProductScreen> {
                               bottom: 0,
                               right: 0,
                               child: GestureDetector(
-                                onTap: ()  {
-                                  // context
-                                  //     .read<ProductBloc>()
-                                  //     .add(ProductToShopEvent(widget.product));
-
+                                onTap: () {
                                   BlocProvider.of<ProductBloc>(context)
                                       .add(ProductToShopEvent(widget.product));
-                                
+
                                   context
                                       .read<ShoppingCardBloc>()
                                       .add(ShoppingCardDataEvent());
