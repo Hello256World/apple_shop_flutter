@@ -129,7 +129,7 @@ class ProductItem extends StatelessWidget {
                     mainAxisAlignment: MainAxisAlignment.center,
                     children: [
                       Text(
-                        _product.price.toString(),
+                        _product.price.toString().priceWithComma(),
                         style: const TextStyle(
                           fontFamily: 'SM',
                           fontSize: 12,
@@ -139,7 +139,9 @@ class ProductItem extends StatelessWidget {
                         ),
                       ),
                       Text(
-                        (_product.price - _product.discountPrice).toString(),
+                        (_product.price - _product.discountPrice)
+                            .toString()
+                            .priceWithComma(),
                         style: const TextStyle(
                           fontFamily: 'SM',
                           color: Colors.white,

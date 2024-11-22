@@ -1,6 +1,7 @@
 import 'dart:ui';
 import 'package:apple_shop_flutter/bloc/category/category_bloc.dart';
 import 'package:apple_shop_flutter/bloc/home/home_bloc.dart';
+import 'package:apple_shop_flutter/bloc/home/home_event.dart';
 import 'package:apple_shop_flutter/bloc/shopping_card/shopping_card_bloc.dart';
 import 'package:apple_shop_flutter/bloc/shopping_card/shopping_card_event.dart';
 import 'package:apple_shop_flutter/data/constants.dart';
@@ -140,11 +141,16 @@ class _MainScreenState extends State<MainScreen> {
         child: const CategoryScreen(),
       ),
       BlocProvider(
-        create: (context) => HomeBloc(
-          locator.get(),
-          locator.get(),
-          locator.get(),
-        ),
+        create: (context) {
+          var bloc = HomeBloc(
+            locator.get(),
+            locator.get(),
+            locator.get(),
+          );
+          bloc.add(HomeResponseEvent());
+
+          return bloc;
+        },
         child: const HomeScreen(),
       )
     ];

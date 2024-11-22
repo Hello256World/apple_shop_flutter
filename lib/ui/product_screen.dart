@@ -1,4 +1,7 @@
 import 'dart:ui';
+import 'package:apple_shop_flutter/bloc/comment/comment_bloc.dart';
+import 'package:apple_shop_flutter/bloc/comment/comment_event.dart';
+import 'package:apple_shop_flutter/bloc/comment/comment_state.dart';
 import 'package:apple_shop_flutter/bloc/product/product_bloc.dart';
 import 'package:apple_shop_flutter/bloc/product/product_event.dart';
 import 'package:apple_shop_flutter/bloc/product/product_state.dart';
@@ -12,6 +15,7 @@ import 'package:apple_shop_flutter/data/widgets/cached_image.dart';
 import 'package:apple_shop_flutter/di/di.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:loading_indicator/loading_indicator.dart';
 
 class ProductScreen extends StatefulWidget {
   const ProductScreen({super.key, required this.product});
@@ -42,7 +46,15 @@ class _ProductScreenState extends State<ProductScreen> {
             builder: (context, state) {
               if (state is ProductLoadingState) {
                 return const Center(
-                  child: CircularProgressIndicator(),
+                  child: SizedBox(
+                    width: 60,
+                    height: 60,
+                    child: LoadingIndicator(
+                      indicatorType: Indicator.ballRotateChase,
+                      colors: [CustomColor.blueColor],
+                      strokeWidth: 2,
+                    ),
+                  ),
                 );
               } else {
                 return CustomScrollView(
@@ -242,7 +254,7 @@ class _ProductScreenState extends State<ProductScreen> {
                     },
                     if (state is ProductResponseState) ...{
                       ProductDescriptionSection(
-                          widget.product.description, state),
+                          widget.product.description, state, widget.product),
                     },
                     SliverToBoxAdapter(
                       child: Container(
@@ -287,15 +299,17 @@ class _ProductScreenState extends State<ProductScreen> {
                                             ),
                                           ),
                                           const SizedBox(width: 5),
-                                          const Column(
+                                          Column(
                                             crossAxisAlignment:
                                                 CrossAxisAlignment.start,
                                             mainAxisAlignment:
                                                 MainAxisAlignment.center,
                                             children: [
                                               Text(
-                                                '17,800,000',
-                                                style: TextStyle(
+                                                widget.product.price
+                                                    .toString()
+                                                    .priceWithComma(),
+                                                style: const TextStyle(
                                                   fontFamily: 'SM',
                                                   fontSize: 12,
                                                   decoration: TextDecoration
@@ -305,8 +319,12 @@ class _ProductScreenState extends State<ProductScreen> {
                                                 ),
                                               ),
                                               Text(
-                                                '16,989,000',
-                                                style: TextStyle(
+                                                (widget.product.price -
+                                                        widget.product
+                                                            .discountPrice)
+                                                    .toString()
+                                                    .priceWithComma(),
+                                                style: const TextStyle(
                                                   fontFamily: 'SB',
                                                   color: Colors.white,
                                                   fontSize: 16,
@@ -324,9 +342,9 @@ class _ProductScreenState extends State<ProductScreen> {
                                                   BorderRadius.circular(7.5),
                                             ),
                                             alignment: Alignment.center,
-                                            child: const Text(
-                                              '%3',
-                                              style: TextStyle(
+                                            child: Text(
+                                              '%${((widget.product.discountPrice / widget.product.price) * 100).round()}',
+                                              style: const TextStyle(
                                                 fontFamily: 'SB',
                                                 fontSize: 10,
                                                 color: Colors.white,
@@ -405,12 +423,14 @@ class _ProductScreenState extends State<ProductScreen> {
 class ProductDescriptionSection extends StatefulWidget {
   const ProductDescriptionSection(
     this.productDescription,
-    this.state, {
+    this.state,
+    this.product, {
     super.key,
   });
 
   final String productDescription;
   final ProductResponseState state;
+  final Product product;
 
   @override
   State<ProductDescriptionSection> createState() =>
@@ -599,118 +619,202 @@ class _ProductDescriptionSectionState extends State<ProductDescriptionSection> {
                 ),
               ),
             ),
-            Container(
-              height: 46,
-              width: double.infinity,
-              padding: const EdgeInsets.symmetric(horizontal: 10),
-              decoration: BoxDecoration(
-                color: Colors.white,
-                borderRadius: BorderRadius.circular(15),
-                border: Border.all(
-                  width: 1,
-                  color: CustomColor.greyColor,
-                ),
-              ),
-              child: Row(
-                children: [
-                  Image.asset('assets/images/left_arrow.png'),
-                  const SizedBox(width: 10),
-                  const Text(
-                    'مشاهده',
-                    style: TextStyle(
-                      fontSize: 12,
-                      fontFamily: 'SB',
-                      color: CustomColor.blueColor,
-                    ),
+            GestureDetector(
+              onTap: () {
+                showModalBottomSheet(
+                    context: context,
+                    isScrollControlled: true,
+                    barrierColor: Colors.transparent,
+                    builder: (context) {
+                      return BlocProvider(
+                        create: (context) {
+                          final bloc = CommentBloc(locator.get());
+                          bloc.add(CommentResposneEvent(widget.product.id));
+                          return bloc;
+                        },
+                        child: DraggableScrollableSheet(
+                          expand: false,
+                          initialChildSize: 0.3,
+                          maxChildSize: 0.7,
+                          minChildSize: 0.1,
+                          builder: (context, scrollController) {
+                            return BottomSheetContent(scrollController);
+                          },
+                        ),
+                      );
+                    });
+              },
+              child: Container(
+                height: 46,
+                width: double.infinity,
+                padding: const EdgeInsets.symmetric(horizontal: 10),
+                decoration: BoxDecoration(
+                  color: Colors.white,
+                  borderRadius: BorderRadius.circular(15),
+                  border: Border.all(
+                    width: 1,
+                    color: CustomColor.greyColor,
                   ),
-                  const Spacer(),
-                  Stack(
-                    clipBehavior: Clip.none,
-                    children: [
-                      Container(
-                        width: 26,
-                        height: 26,
-                        decoration: BoxDecoration(
-                          color: Colors.green,
-                          borderRadius: BorderRadius.circular(8),
-                          border: Border.all(color: Colors.white, width: 1),
-                        ),
+                ),
+                child: Row(
+                  children: [
+                    Image.asset('assets/images/left_arrow.png'),
+                    const SizedBox(width: 10),
+                    const Text(
+                      'مشاهده',
+                      style: TextStyle(
+                        fontSize: 12,
+                        fontFamily: 'SB',
+                        color: CustomColor.blueColor,
                       ),
-                      Positioned(
-                        right: 15,
-                        child: Container(
+                    ),
+                    const Spacer(),
+                    Stack(
+                      clipBehavior: Clip.none,
+                      children: [
+                        Container(
                           width: 26,
                           height: 26,
                           decoration: BoxDecoration(
-                            color: Colors.blue,
+                            color: Colors.green,
                             borderRadius: BorderRadius.circular(8),
                             border: Border.all(color: Colors.white, width: 1),
                           ),
                         ),
-                      ),
-                      Positioned(
-                        right: 30,
-                        child: Container(
-                          width: 26,
-                          height: 26,
-                          decoration: BoxDecoration(
-                            color: Colors.red,
-                            borderRadius: BorderRadius.circular(8),
-                            border: Border.all(color: Colors.white, width: 1),
-                          ),
-                        ),
-                      ),
-                      Positioned(
-                        right: 45,
-                        child: Container(
-                          width: 26,
-                          height: 26,
-                          decoration: BoxDecoration(
-                            color: Colors.purple,
-                            borderRadius: BorderRadius.circular(8),
-                            border: Border.all(color: Colors.white, width: 1),
-                          ),
-                        ),
-                      ),
-                      Positioned(
-                        right: 60,
-                        child: Container(
-                          width: 26,
-                          height: 26,
-                          decoration: BoxDecoration(
-                            color: CustomColor.greyColor,
-                            borderRadius: BorderRadius.circular(8),
-                            border: Border.all(color: Colors.white, width: 1),
-                          ),
-                          alignment: Alignment.center,
-                          child: const Text(
-                            '+10',
-                            style: TextStyle(
-                              fontSize: 10,
-                              fontFamily: 'SB',
-                              color: Colors.white,
+                        Positioned(
+                          right: 15,
+                          child: Container(
+                            width: 26,
+                            height: 26,
+                            decoration: BoxDecoration(
+                              color: Colors.blue,
+                              borderRadius: BorderRadius.circular(8),
+                              border: Border.all(color: Colors.white, width: 1),
                             ),
                           ),
                         ),
-                      ),
-                    ],
-                  ),
-                  const SizedBox(width: 10),
-                  const Text(
-                    'نظر کاربران:',
-                    textDirection: TextDirection.rtl,
-                    style: TextStyle(
-                      fontFamily: 'SM',
-                      fontSize: 12,
-                      color: Colors.black,
+                        Positioned(
+                          right: 30,
+                          child: Container(
+                            width: 26,
+                            height: 26,
+                            decoration: BoxDecoration(
+                              color: Colors.red,
+                              borderRadius: BorderRadius.circular(8),
+                              border: Border.all(color: Colors.white, width: 1),
+                            ),
+                          ),
+                        ),
+                        Positioned(
+                          right: 45,
+                          child: Container(
+                            width: 26,
+                            height: 26,
+                            decoration: BoxDecoration(
+                              color: Colors.purple,
+                              borderRadius: BorderRadius.circular(8),
+                              border: Border.all(color: Colors.white, width: 1),
+                            ),
+                          ),
+                        ),
+                        Positioned(
+                          right: 60,
+                          child: Container(
+                            width: 26,
+                            height: 26,
+                            decoration: BoxDecoration(
+                              color: CustomColor.greyColor,
+                              borderRadius: BorderRadius.circular(8),
+                              border: Border.all(color: Colors.white, width: 1),
+                            ),
+                            alignment: Alignment.center,
+                            child: const Text(
+                              '+10',
+                              style: TextStyle(
+                                fontSize: 10,
+                                fontFamily: 'SB',
+                                color: Colors.white,
+                              ),
+                            ),
+                          ),
+                        ),
+                      ],
                     ),
-                  ),
-                ],
+                    const SizedBox(width: 10),
+                    const Text(
+                      'نظر کاربران:',
+                      textDirection: TextDirection.rtl,
+                      style: TextStyle(
+                        fontFamily: 'SM',
+                        fontSize: 12,
+                        color: Colors.black,
+                      ),
+                    ),
+                  ],
+                ),
               ),
             ),
           ],
         ),
       ),
+    );
+  }
+}
+
+class BottomSheetContent extends StatelessWidget {
+  const BottomSheetContent(
+    this.controller, {
+    super.key,
+  });
+
+  final ScrollController controller;
+
+  @override
+  Widget build(BuildContext context) {
+    return BlocBuilder<CommentBloc, CommentState>(
+      builder: (context, state) {
+        return CustomScrollView(
+          controller: controller,
+          slivers: [
+            if (state is CommentLoadingState) ...{
+              const SliverFillRemaining(
+                child: UnconstrainedBox(
+                  child: SizedBox(
+                    width: 60,
+                    height: 60,
+                    child: LoadingIndicator(
+                      indicatorType: Indicator.ballRotateChase,
+                      colors: [CustomColor.blueColor],
+                      strokeWidth: 2,
+                    ),
+                  ),
+                ),
+              ),
+            },
+            if (state is CommentResposneState) ...{
+              state.comments.fold(
+                (l) {
+                  return SliverToBoxAdapter(
+                    child: Text(l),
+                  );
+                },
+                (r) {
+                  return SliverList(
+                      delegate: SliverChildBuilderDelegate((context, index) {
+                    var comment = r[index];
+                    return Row(
+                      children: [
+                        Text(comment.text),
+                        CachedImage(imageUrl: comment.userThumbnail)
+                      ],
+                    );
+                  }, childCount: r.length));
+                },
+              )
+            },
+          ],
+        );
+      },
     );
   }
 }

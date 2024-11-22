@@ -7,7 +7,6 @@ import 'package:apple_shop_flutter/data/models/product_image.dart';
 import 'package:apple_shop_flutter/data/models/product_properties.dart';
 import 'package:apple_shop_flutter/data/models/product_variant.dart';
 import 'package:apple_shop_flutter/data/utils/api_exception.dart';
-import 'package:apple_shop_flutter/di/di.dart';
 import 'package:dartz/dartz.dart';
 import 'package:isar/isar.dart';
 

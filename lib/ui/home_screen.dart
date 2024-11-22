@@ -10,6 +10,7 @@ import 'package:apple_shop_flutter/data/widgets/category_item.dart';
 import 'package:apple_shop_flutter/data/widgets/product_item.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:loading_indicator/loading_indicator.dart';
 
 class HomeScreen extends StatefulWidget {
   const HomeScreen({super.key});
@@ -20,77 +21,80 @@ class HomeScreen extends StatefulWidget {
 
 class _HomeScreenState extends State<HomeScreen> {
   @override
-  void initState() {
-    super.initState();
-    context.read<HomeBloc>().add(HomeResponseEvent());
-  }
-
-  @override
   Widget build(BuildContext context) {
     return Scaffold(
       backgroundColor: CustomColor.whiteColor,
       body: SafeArea(
         child: BlocBuilder<HomeBloc, HomeState>(
           builder: (context, state) {
-            return CustomScrollView(
-              slivers: [
-                const SearchBar(),
-                if (state is HomeLoadingState) ...[
-                  const SliverFillRemaining(
-                    child: UnconstrainedBox(
-                      child: CircularProgressIndicator(),
+            return RefreshIndicator(
+              onRefresh: () async {
+                context.read<HomeBloc>().add(HomeResponseEvent());
+              },
+              color: CustomColor.blueColor,
+              backgroundColor: CustomColor.whiteColor,
+              child: CustomScrollView(
+                slivers: [
+                  const SearchBar(),
+                  if (state is HomeLoadingState) ...{
+                    const SliverFillRemaining(
+                      child: UnconstrainedBox(
+                        child: SizedBox(
+                          width: 60,
+                          height: 60,
+                          child: LoadingIndicator(
+                            indicatorType: Indicator.ballRotateChase,
+                            colors: [CustomColor.blueColor],
+                            strokeWidth: 2,
+                          ),
+                        ),
+                      ),
+                    )
+                  },
+                  if (state is HomeResponseState) ...{
+                    state.banners.fold(
+                      (l) {
+                        return SliverToBoxAdapter(
+                          child: Text(l),
+                        );
+                      },
+                      (r) {
+                        return BannerSliderSection(r);
+                      },
                     ),
-                  )
+                    state.categories.fold(
+                      (l) {
+                        return SliverToBoxAdapter(
+                          child: Text(l),
+                        );
+                      },
+                      (r) {
+                        return CategorySection(r);
+                      },
+                    ),
+                    state.bestSellerProducts.fold(
+                      (l) {
+                        return SliverToBoxAdapter(
+                          child: Text(l),
+                        );
+                      },
+                      (r) {
+                        return MostSellsSection(r);
+                      },
+                    ),
+                    state.hottestProducts.fold(
+                      (l) {
+                        return SliverToBoxAdapter(
+                          child: Text(l),
+                        );
+                      },
+                      (r) {
+                        return MostViewSection(r);
+                      },
+                    )
+                  },
                 ],
-                if (state is HomeResponseState) ...[
-                  state.banners.fold(
-                    (l) {
-                      return SliverToBoxAdapter(
-                        child: Text(l),
-                      );
-                    },
-                    (r) {
-                      return BannerSliderSection(r);
-                    },
-                  ),
-                ],
-                if (state is HomeResponseState) ...[
-                  state.categories.fold(
-                    (l) {
-                      return SliverToBoxAdapter(
-                        child: Text(l),
-                      );
-                    },
-                    (r) {
-                      return CategorySection(r);
-                    },
-                  )
-                ],
-                if (state is HomeResponseState) ...[
-                  state.bestSellerProducts.fold(
-                    (l) {
-                      return SliverToBoxAdapter(
-                        child: Text(l),
-                      );
-                    },
-                    (r) {
-                      return MostSellsSection(r);
-                    },
-                  )
-                ],
-                if (state is HomeResponseState) ...[
-                  state.hottestProducts.fold(
-                    (l) {
-                      return SliverToBoxAdapter(
-                        child: Text(l),
-                      );
-                    },
-                    (r) {
-                      return MostViewSection(r);
-                    },
-                  )
-                ],
-              ],
+              ),
             );
           },
         ),
