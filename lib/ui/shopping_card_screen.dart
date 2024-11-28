@@ -1,4 +1,5 @@
 import 'package:apple_shop_flutter/bloc/shopping_card/shopping_card_bloc.dart';
+import 'package:apple_shop_flutter/bloc/shopping_card/shopping_card_event.dart';
 import 'package:apple_shop_flutter/bloc/shopping_card/shopping_card_state.dart';
 import 'package:apple_shop_flutter/data/constants.dart';
 import 'package:apple_shop_flutter/data/models/shopping_card.dart';
@@ -144,7 +145,8 @@ class _ShoppingCardScreenState extends State<ShoppingCardScreen> {
                         child: Text(
                           totalPrice == 0
                               ? 'سبد خرید شما خالی است'
-                              : totalPrice.toString(),
+                              : 'مبلغ خرید : ${totalPrice.toString().priceWithComma()} ',
+                          textDirection: TextDirection.rtl,
                           style: const TextStyle(
                             fontFamily: 'SB',
                             fontSize: 16,
@@ -261,31 +263,37 @@ class ShoppingCardItem extends StatelessWidget {
                               title: 'آبی',
                               color: '0330fc',
                             ),
-                            Container(
-                              padding: const EdgeInsets.symmetric(
-                                  horizontal: 10, vertical: 5),
-                              decoration: BoxDecoration(
-                                borderRadius: BorderRadius.circular(10),
-                                border: Border.all(
-                                  color: const Color(0xffE5E5E5),
-                                  width: 1,
-                                ),
-                              ),
-                              child: Row(
-                                mainAxisSize: MainAxisSize.min,
-                                children: [
-                                  const Text(
-                                    'حذف',
-                                    textDirection: TextDirection.rtl,
-                                    style: TextStyle(
-                                      fontSize: 10,
-                                      fontFamily: 'SM',
-                                      fontWeight: FontWeight.w500,
-                                    ),
+                            GestureDetector(
+                              onTap: () {
+                                context.read<ShoppingCardBloc>().add(
+                                    ShoppingCardProductRemoveEvent(card.id));
+                              },
+                              child: Container(
+                                padding: const EdgeInsets.symmetric(
+                                    horizontal: 10, vertical: 5),
+                                decoration: BoxDecoration(
+                                  borderRadius: BorderRadius.circular(10),
+                                  border: Border.all(
+                                    color: const Color(0xffE5E5E5),
+                                    width: 1,
                                   ),
-                                  const SizedBox(width: 5),
-                                  Image.asset('assets/images/trash_icon.png'),
-                                ],
+                                ),
+                                child: Row(
+                                  mainAxisSize: MainAxisSize.min,
+                                  children: [
+                                    const Text(
+                                      'حذف',
+                                      textDirection: TextDirection.rtl,
+                                      style: TextStyle(
+                                        fontSize: 10,
+                                        fontFamily: 'SM',
+                                        fontWeight: FontWeight.w500,
+                                      ),
+                                    ),
+                                    const SizedBox(width: 5),
+                                    Image.asset('assets/images/trash_icon.png'),
+                                  ],
+                                ),
                               ),
                             ),
                           ],
@@ -330,7 +338,7 @@ class ShoppingCardItem extends StatelessWidget {
                 ),
                 const SizedBox(width: 5),
                 Text(
-                  (card.price - card.discountPrice).toString(),
+                  (card.price - card.discountPrice).toString().priceWithComma(),
                   style: const TextStyle(
                     fontFamily: 'SM',
                     fontSize: 16,

@@ -10,3 +10,13 @@ class CommentResposneState extends CommentState {
 
   CommentResposneState(this.comments);
 }
+
+class AddCommentLoadingState extends CommentState{
+  
+}
+
+class AddCommentResponseState extends CommentState{
+ final Either<String,String> commentResponse;
+
+ AddCommentResponseState(this.commentResponse);
+} 

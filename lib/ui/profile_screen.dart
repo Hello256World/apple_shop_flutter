@@ -1,4 +1,6 @@
 import 'package:apple_shop_flutter/data/constants.dart';
+import 'package:apple_shop_flutter/data/utils/auth_manager.dart';
+import 'package:apple_shop_flutter/ui/login_screen.dart';
 import 'package:flutter/material.dart';
 
 class ProfileScreen extends StatelessWidget {
@@ -43,6 +45,18 @@ class ProfileScreen extends StatelessWidget {
                   ),
                 )
               ],
+            ),
+            ElevatedButton(
+              onPressed: () {
+                AuthManager.logOut();
+                Navigator.pushReplacement(
+                  context,
+                  MaterialPageRoute(
+                    builder: (context) => LoginScreen(),
+                  ),
+                );
+              },
+              child: const Text('خروج'),
             ),
             const Text(
               'میلاد رفاه',

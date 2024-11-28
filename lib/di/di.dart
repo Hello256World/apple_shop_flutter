@@ -10,6 +10,7 @@ import 'package:apple_shop_flutter/data/repository/banner_repository.dart';
 import 'package:apple_shop_flutter/data/repository/category_repository.dart';
 import 'package:apple_shop_flutter/data/repository/comment_repository.dart';
 import 'package:apple_shop_flutter/data/repository/product_repository.dart';
+import 'package:apple_shop_flutter/data/utils/dio_provider.dart';
 import 'package:dio/dio.dart';
 import 'package:get_it/get_it.dart';
 import 'package:isar/isar.dart';
@@ -29,17 +30,11 @@ Future<void> diSetup() async {
     await SharedPreferences.getInstance(),
   );
 
-  // http://startflutter.ir/
-  // https://pocketbase-uicds7.chbk.app/
-  locator.registerSingleton<Dio>(
-    Dio(
-      BaseOptions(baseUrl: 'http://startflutter.ir/'),
-    ),
-  );
+  locator.registerSingleton<Dio>(DioProvider.createDio());
 
   // apis
   locator.registerFactory<IAuthentication>(
-    () => Authentication(locator.get()),
+    () => Authentication(),
   );
   locator.registerFactory<ICategoryApi>(
     () => CategoryApi(locator.get()),

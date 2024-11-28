@@ -1,6 +1,10 @@
+import 'package:apple_shop_flutter/data/utils/auth_manager.dart';
 import 'package:apple_shop_flutter/di/di.dart';
+import 'package:apple_shop_flutter/ui/login_screen.dart';
 import 'package:apple_shop_flutter/ui/main_screen.dart';
 import 'package:flutter/material.dart';
+
+GlobalKey<NavigatorState> navigateGlobalKey = GlobalKey();
 
 Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
@@ -13,8 +17,9 @@ class Application extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return const MaterialApp(
-      home: MainScreen(),
+    return MaterialApp(
+      navigatorKey: navigateGlobalKey,
+      home: AuthManager.isLogin() ? const MainScreen() : LoginScreen(),
     );
   }
 }

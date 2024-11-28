@@ -5,3 +5,10 @@ class CommentResposneEvent extends CommentEvent {
 
   CommentResposneEvent(this.productId);
 }
+
+class AddCommentEvent extends CommentEvent {
+  final String comment;
+  final String userId;
+  final String productId;
+  AddCommentEvent(this.comment,this.productId,this.userId);
+}

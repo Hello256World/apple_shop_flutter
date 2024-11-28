@@ -7,8 +7,18 @@ class CommentBloc extends Bloc<CommentEvent, CommentState> {
   final ICommentRepository _commentRepository;
   CommentBloc(this._commentRepository) : super(CommentLoadingState()) {
     on<CommentResposneEvent>((event, emit) async {
-      var comments = await _commentRepository.getProductComments(event.productId);
+      var comments =
+          await _commentRepository.getProductComments(event.productId);
       emit(CommentResposneState(comments));
     });
+
+    on<AddCommentEvent>(
+      (event, emit) async {
+        emit(CommentLoadingState());
+        var comments =
+            await _commentRepository.getProductComments(event.productId);
+        emit(CommentResposneState(comments));
+      },
+    );
   }
 }

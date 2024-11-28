@@ -4,6 +4,7 @@ import 'package:dio/dio.dart';
 
 abstract class ICommentApi {
   Future<List<Comment>> fetchProductComment(String productId);
+  Future<void> postCommentForProduct(String productId,String comment,String userId);
 }
 
 class CommentApi extends ICommentApi {
@@ -30,6 +31,21 @@ class CommentApi extends ICommentApi {
       throw ApiException(ex.response?.statusCode, ex.response?.data['message']);
     } catch (ex) {
       throw ApiException(0, 'error is out of Dio Exception');
+    }
+  }
+  
+  @override
+  Future<void> postCommentForProduct(String productId,String comment,String userId)async {
+    try {
+       await _dio.post('api/collections/comment/records',data: {
+        'text' : comment,
+        'user_id' : userId,
+        'product_id' : productId,
+      });
+    }on DioException catch (ex) {
+      throw ApiException(ex.response?.statusCode, ex.response?.data['message']);
+    }catch(ex){
+      throw ApiException(0, 'Error out of dio Exception');
     }
   }
 }

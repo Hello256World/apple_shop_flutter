@@ -32,7 +32,7 @@ class AuthenticationRepository extends IAuthenticationRepository {
 
       return const Right('ثبت نام انجام شد');
     } on ApiException catch (e) {
-      return left(e.message ?? 'خطا پیام متنی ندارد');
+      return left(e.message!);
     }
   }
 
@@ -50,7 +50,7 @@ class AuthenticationRepository extends IAuthenticationRepository {
       }
       return right('there is no error and token');
     } on ApiException catch (ex) {
-      return left(ex.toString());
+      return left(ex.message!);
     }
   }
 }

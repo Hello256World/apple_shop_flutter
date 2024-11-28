@@ -24,6 +24,7 @@ abstract class IProductRepository {
       String categoryId);
   Future<Either<String, String>> addProductToShop(Product product);
   Future<Either<String, List<ShoppingCard>>> getShoppingCardItems();
+  Future<void> removeProductFromShop(int productId);
 }
 
 class ProductRepository extends IProductRepository {
@@ -143,12 +144,19 @@ class ProductRepository extends IProductRepository {
   @override
   Future<Either<String, List<ShoppingCard>>> getShoppingCardItems() async {
     try {
-      await Future.delayed(const Duration(seconds: 1));
+      await Future.delayed(const Duration(milliseconds: 50));
       var cards = await _dbInstance.shoppingCards.where().findAll();
 
       return right(cards);
     } catch (ex) {
       return left(ex.toString());
     }
+  }
+
+  @override
+  Future<void> removeProductFromShop(int productId) async {
+    await _dbInstance.writeTxn(() async {
+      await _dbInstance.shoppingCards.delete(productId);
+    });
   }
 }
